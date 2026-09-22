@@ -1,15 +1,13 @@
 const mongoose = require("mongoose")
 
-const mongodburl = process.env.MONGODBURL
-
-const connectDB = () => {
-    try{
-        mongoose.connect(mongodburl)
+const ConnectDB = () => {
+    try {
+        mongoose.connect(process.env.MONGODB_URI)
         console.log("mongoDB connected sucessfully");
         
-    }catch(err){
+    } catch (error) {
         console.log("mongoDB connection failed");
-        console.log(err.message)
+        console.log(error.message)
         
         process.exit(1)
         
@@ -17,4 +15,4 @@ const connectDB = () => {
     }
 }
 
-module.exports = connectDB
+module.exports = ConnectDB
