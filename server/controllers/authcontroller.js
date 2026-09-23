@@ -83,3 +83,22 @@ try{
     })
 }
 }
+
+module.exports.logout = (req, res)=>{
+    res.clearCookie("token")
+    return res.json({
+        message: "logout sucessfully"
+    })
+}
+
+module.exports.GetME= (req, res ) => {
+    try{
+        return res.json({
+            user: req.user
+        })
+    }catch(error){
+        return res.status(500).json({
+            message: error.message
+        })
+    }
+}

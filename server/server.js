@@ -2,9 +2,10 @@ const dotenv = require("dotenv")
 
 const app = require("./app")
 const http = require("http")
-const ConnectDB = require("./config/db")
 
 dotenv.config()
+const ConnectDB = require("./config/db")
+
 const server = http.createServer(app)
 ConnectDB()
 
