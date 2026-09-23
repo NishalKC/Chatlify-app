@@ -1,5 +1,6 @@
 const userModel = require("../models/user")
 const bcrypt = require("bcrypt")
+const generateToken = require("../utils/generateToken")
 
 module.exports.register= async(req , res ) => {
     try {
@@ -19,15 +20,21 @@ module.exports.register= async(req , res ) => {
         }
 
 
-        let hashedpassword = bcrypt.hash(password , 10)
+        let hashedpassword = await  bcrypt.hash(password , 10)
         const user = await userModel.create({
             fullname, 
             username,
             email,
             password: hashedpassword
         })
-
-        return res.status().json({
+        let token = generateToken(user)
+        res.cookie("token", token,{
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        return res.status(200).json({
             message: "user created sucesfully",
             user
         })
@@ -37,4 +44,42 @@ module.exports.register= async(req , res ) => {
             message: error.message
         })
     }
+}
+
+module.exports.login=  async(req, res)=>{
+try{
+
+    let{email, password} = req.body
+    let user = await userModel.findOne({email})
+    if(!user){
+        return res.status(401).json({
+            message: "email or password is incorrect"
+        })
+    }
+
+    let match=await bcrypt.compare(password , user.password)
+    if(!match){
+        return res.status(401).json({
+            message: "email or password is incorrect"
+        })
+    }
+
+    let token = generateToken(user)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+        message: "login sucessfully",
+        user
+    })
+
+}catch(error){
+    return res.status(500).json({
+        message: error.message
+    })
+}
 }
