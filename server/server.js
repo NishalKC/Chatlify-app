@@ -9,6 +9,9 @@ const ConnectDB = require("./config/db")
 const server = http.createServer(app)
 ConnectDB()
 
+const{initilization}= require("./socket/socket")
+initilization(server)
+
 const Port = process.env.PORT || 5000;
 
 server.listen(Port, () => {

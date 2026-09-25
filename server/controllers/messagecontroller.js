@@ -1,10 +1,11 @@
 const conversation = require("../models/conversation")
 const messageModel = require("../models/message")
 const message = require("../models/message")
+const {io ,onlineUsers } = require("../socket/socket")
 
 module.exports.sendmessage=async  (req, res ) => {
     try {
-        let{conversationId, text}= req.body
+        let{conversationId, receiverId,text}= req.body
         let message = await messageModel.create({
             conversation: conversationId,
             sender:req.user._id,
@@ -13,6 +14,10 @@ module.exports.sendmessage=async  (req, res ) => {
         await conversation.findOneAndUpdate({_id: conversationId},{
             latestmessage: message._id
         })
+        let receiverSocket= onlineUsers.get(receiverId)
+        if(receiverScoket){
+            io.to(receiverSocket).emit("receive-message", message)
+        }
         return res.json(message)
     } catch (error) {
         return res.json({
