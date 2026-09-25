@@ -18,7 +18,7 @@ io.on("connection", (socket) => {
     socket.on("user-online", (userId) => {
         onlineUsers.set(userId , socket.id)
 
-        io.emit("online-user", [...onlineUsers.keys()])
+        io.emit("online-users", [...onlineUsers.keys()])
     }
     )
 
@@ -35,6 +35,21 @@ io.on("connection", (socket) => {
 
     }
     )
+    socket.on("typing", ({ receiverId }) => {
+    const receiverSocket = onlineUsers.get(receiverId);
+
+    if(receiverSocket){
+        io.to(receiverSocket).emit("typing");
+    }
+    });
+
+    socket.on("stop-typing", ({ receiverId }) => {
+    const receiverSocket = onlineUsers.get(receiverId);
+
+    if(receiverSocket){
+        io.to(receiverSocket).emit("stop-typing");
+    }
+    });
 })
 
 module.exports= {
