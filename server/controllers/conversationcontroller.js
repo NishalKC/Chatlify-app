@@ -28,14 +28,14 @@ module.exports.Createconversation= async (req, res)=>{
 
 module.exports.Getconversation = async(req, res  ) => {
     try{
-    const conversations = await Conversation.find({
+    const Conversations = await conversation.find({
       participants: req.user._id,
     })
       .populate("participants", "-password")
-      .populate("latestMessage")
+      .populate("latestmessage")
       .sort({ updatedAt: -1 });
 
-    return res.json(conversations);
+    return res.json(Conversations);
     }catch(error){
         return res.status(500).json({
             message: error.message

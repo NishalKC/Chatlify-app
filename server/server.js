@@ -1,17 +1,16 @@
 const dotenv = require("dotenv")
+dotenv.config()
 
 const app = require("./app")
 const http = require("http")
 
-dotenv.config()
 const ConnectDB = require("./config/db")
+const {  initializeSocket } = require("./socket/socket")
 
 const server = http.createServer(app)
 ConnectDB()
 
-const{initilization}= require("./socket/socket")
-initilization(server)
-
+initializeSocket(server)
 const Port = process.env.PORT || 5000;
 
 server.listen(Port, () => {

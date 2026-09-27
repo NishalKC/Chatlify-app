@@ -1,58 +1,37 @@
-const {Server } = require("socket.io")
+const  { Server } = require("socket.io");
 
-let io
-const onlineUsers = new Map()
+let io;
+const onlineUsers = new Map();
 
-module.exports.initilization = (server) => {
-    io=  new Server(server,{
-        cors:{
-            origin: process.env.CLIENT_URL,
-            credentials: true
-        },
-    })
-}
+const initializeSocket = (server) => {
+  io = new Server(server, {
+    cors: {
+      origin: process.env.CLIENT_URL,
+      credentials: true,
+    },
+  });
 
-io.on("connection", (socket) => {
-    console.log("user Connected:",  socket.id);
-    
+  io.on("connection", (socket) => {
+    console.log("User Connected:", socket.id);
+
     socket.on("user-online", (userId) => {
-        onlineUsers.set(userId , socket.id)
+      onlineUsers.set(userId, socket.id);
 
-        io.emit("online-users", [...onlineUsers.keys()])
-    }
-    )
+      io.emit("online-users", [...onlineUsers.keys()]);
+    });
 
     socket.on("disconnect", () => {
-        for (const [userId, socketId] of onlineUsers.entries()) {
+      for (const [userId, socketId] of onlineUsers.entries()) {
         if (socketId === socket.id) {
           onlineUsers.delete(userId);
           break;
         }
       }
-      io.emit("online-users", [...onlineUsers.keys()])
-      console.log("disconnect:", socket.id);
-      
 
-    }
-    )
-    socket.on("typing", ({ receiverId }) => {
-    const receiverSocket = onlineUsers.get(receiverId);
-
-    if(receiverSocket){
-        io.to(receiverSocket).emit("typing");
-    }
+      io.emit("online-users", [...onlineUsers.keys()]);
+      console.log("Disconnected:", socket.id);
     });
+  });
+};
 
-    socket.on("stop-typing", ({ receiverId }) => {
-    const receiverSocket = onlineUsers.get(receiverId);
-
-    if(receiverSocket){
-        io.to(receiverSocket).emit("stop-typing");
-    }
-    });
-})
-
-module.exports= {
-    io,
-    onlineUsers
-}
+module.exports = { io, onlineUsers , initializeSocket};

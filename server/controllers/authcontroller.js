@@ -1,6 +1,7 @@
 const userModel = require("../models/user")
 const bcrypt = require("bcrypt")
 const generateToken = require("../utils/generateToken")
+const {onlineUsers} = require("../socket/socket")
 
 module.exports.register= async(req , res ) => {
     try {
@@ -91,8 +92,12 @@ module.exports.logout = (req, res)=>{
     })
 }
 
-module.exports.GetME= (req, res ) => {
+module.exports.GetME=  async(req, res ) => {
     try{
+        const online = onlineUsers.include(req.user._id)
+        if(online){
+            await userModel.findOneAndUpdate({isOnline}, {})
+        }
         return res.json({
             user: req.user
         })

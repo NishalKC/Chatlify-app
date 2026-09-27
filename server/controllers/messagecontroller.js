@@ -6,10 +6,12 @@ const {io ,onlineUsers } = require("../socket/socket")
 module.exports.sendmessage=async  (req, res ) => {
     try {
         let{conversationId, receiverId,text}= req.body
+        let image = req.file? req.file.path : "";
         let message = await messageModel.create({
             conversation: conversationId,
             sender:req.user._id,
             text,
+            image
         })
         await conversation.findOneAndUpdate({_id: conversationId},{
             latestmessage: message._id
