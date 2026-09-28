@@ -94,10 +94,6 @@ module.exports.logout = (req, res)=>{
 
 module.exports.GetME=  async(req, res ) => {
     try{
-        const online = onlineUsers.include(req.user._id)
-        if(online){
-            await userModel.findOneAndUpdate({isOnline}, {})
-        }
         return res.json({
             user: req.user
         })

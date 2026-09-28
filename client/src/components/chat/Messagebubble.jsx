@@ -26,6 +26,7 @@ const formatMessageTime = (dateString) => {
 
 const Messagebubble = ({ msg, user }) => {
   console.log(msg);
+  
   return (
     <div>
       {user?._id === msg?.sender?._id ? (
@@ -37,7 +38,7 @@ const Messagebubble = ({ msg, user }) => {
                 {formatMessageTime(msg?.createdAt)}
               </h1>
             </div>
-            <p className="bg-zinc-700 w-4/5 md:max-w-fit px-5 py-1 rounded-md self-start">{msg.text}</p>
+            <p className="bg-zinc-700 w-4/5 md:max-w-fit px-5 py-1 rounded-md self-start">{msg?.text}</p>
           </div>
         </div>
       ) : (
@@ -46,10 +47,10 @@ const Messagebubble = ({ msg, user }) => {
             <div className='flex gap-3 align-middle self-end flex-row-reverse'>
             <img src={avatar} className=" h-3 w-3 rounded-full self-end" alt="" />
             <h1 className="self-end text-[14px] text-zinc-500">
-              {formatMessageTime(msg.createdAt)}
+              {formatMessageTime(msg?.createdAt)}
             </h1>
             </div>
-            <p className="bg-blue-500 w-4/5 md:max-w-fit px-5 py-1 rounded-md self-end">{msg.text}</p>
+            <p className="bg-blue-500 w-4/5 md:max-w-fit px-5 py-1 rounded-md self-end">{msg?.text}</p>
           </div>
         </div>
       )}

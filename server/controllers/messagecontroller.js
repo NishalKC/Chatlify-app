@@ -1,24 +1,25 @@
 const conversation = require("../models/conversation")
 const messageModel = require("../models/message")
 const message = require("../models/message")
-const {io ,onlineUsers } = require("../socket/socket")
+const {getIO ,onlineUsers } = require("../socket/socket")
 
 module.exports.sendmessage=async  (req, res ) => {
     try {
         let{conversationId, receiverId,text}= req.body
         let image = req.file? req.file.path : "";
-        let message = await messageModel.create({
+        let newmessage = await messageModel.create({
             conversation: conversationId,
             sender:req.user._id,
             text,
             image
         })
+        let message =await messageModel.findOne({_id: newmessage._id}).populate("sender", "username email fullname")
         await conversation.findOneAndUpdate({_id: conversationId},{
             latestmessage: message._id
         })
         let receiverSocket= onlineUsers.get(receiverId)
-        if(receiverScoket){
-            io.to(receiverSocket).emit("receive-message", message)
+        if(receiverSocket){
+            getIO().to(receiverSocket).emit("receive-message", message)
         }
         return res.json(message)
     } catch (error) {

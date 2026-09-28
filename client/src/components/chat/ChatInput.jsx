@@ -7,7 +7,6 @@ const ChatInput = ({chat, user,setMessage}) => {
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
   const iconSize = 30;
-  
   const handletext= (e) => {
     setText(e.target.value)
   }
@@ -26,7 +25,6 @@ const ChatInput = ({chat, user,setMessage}) => {
       receiverId,
       text: Text,
     });
-
     setMessage((prev) => [...prev, res.data]);
     setText("");
   } catch (err) {

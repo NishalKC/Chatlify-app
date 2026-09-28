@@ -1,4 +1,4 @@
-const  { Server } = require("socket.io");
+const { Server } = require("socket.io");
 
 let io;
 const onlineUsers = new Map();
@@ -16,8 +16,16 @@ const initializeSocket = (server) => {
 
     socket.on("user-online", (userId) => {
       onlineUsers.set(userId, socket.id);
+    });
 
-      io.emit("online-users", [...onlineUsers.keys()]);
+    socket.on("send-message", ({ receiverId, message }) => {
+      const receiverSocket = onlineUsers.get(receiverId);
+
+      console.log("Receiver Socket:", receiverSocket);
+
+      if (receiverSocket) {
+        io.to(receiverSocket).emit("receive-message", message);
+      }
     });
 
     socket.on("disconnect", () => {
@@ -27,11 +35,14 @@ const initializeSocket = (server) => {
           break;
         }
       }
-
-      io.emit("online-users", [...onlineUsers.keys()]);
-      console.log("Disconnected:", socket.id);
     });
   });
 };
 
-module.exports = { io, onlineUsers , initializeSocket};
+const getIO = () => io;
+
+module.exports = {
+  initializeSocket,
+  getIO,
+  onlineUsers,
+};

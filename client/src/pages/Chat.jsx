@@ -13,15 +13,11 @@ const Chat = ({ user , Islogin, setIslogin}) => {
   const [currentChat, setCurrentChat] = useState(null);
 
   const userId = user?._id;
-
   const loadChats = async () => {
     try {
       const response = await api.get("/conversation/all");
       setChats(response?.data);
 
-      if (socket && userId) {
-        socket.emit("user-online", userId);
-      }
     } catch (error) {
       console.log(error);
     }
@@ -30,9 +26,31 @@ const Chat = ({ user , Islogin, setIslogin}) => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (userId) loadChats();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [userId]);
 
+  useEffect(() => {
+    if(userId) {
+      socket.emit("user-online", userId)
+    }
+    },[userId, socket]
+    )
+    useEffect(() => {
+  const handleReceiveMessage = (message) => {
+    console.log("📩 Received:", message);
+
+    // Only add the message if this chat is currently open
+    if (currentChat?._id.toString() === message.conversation.toString()) {
+      setMessage((prev) => [...prev, message]);
+    }
+
+    // Later we'll update the sidebar for other conversations too.
+  };
+
+  socket.on("receive-message", handleReceiveMessage);
+
+  return () => socket.off("receive-message", handleReceiveMessage);
+}, [socket, currentChat]);
   return (
     <div className="flex h-screen bg-zinc-950 gap-5 md:px-4 py-5 text-white">
       <ChatSideBar
