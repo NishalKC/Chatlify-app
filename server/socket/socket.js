@@ -16,6 +16,7 @@ const initializeSocket = (server) => {
 
     socket.on("user-online", (userId) => {
       onlineUsers.set(userId, socket.id);
+      io.emit("online-users", [...onlineUsers.keys()])
     });
 
     socket.on("send-message", ({ receiverId, message }) => {
@@ -27,7 +28,20 @@ const initializeSocket = (server) => {
         io.to(receiverSocket).emit("receive-message", message);
       }
     });
+    socket.on("typing", ({receiverId}) => {
+      let receiverSocket = onlineUsers.get(receiverId)
+      if(receiverSocket){
+        io.to(receiverId).emit("typing")
+      }
+    }
+    )
+    socket.on("stop-typing", ({ receiverId }) => {
+    const receiverSocket = onlineUsers.get(receiverId);
 
+    if(receiverSocket){
+        io.to(receiverSocket).emit("stop-typing");
+    }
+});
     socket.on("disconnect", () => {
       for (const [userId, socketId] of onlineUsers.entries()) {
         if (socketId === socket.id) {

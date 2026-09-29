@@ -6,7 +6,7 @@ import api from "../../services/Api"
 import{User} from "lucide-react"
 import {Link, useNavigate} from "react-router-dom"
 
-const ChatSideBar = ({chats, user, setCurrentChat, islogin, setislogin}) => {
+const ChatSideBar = ({chats, user, setCurrentChat, islogin, setislogin, OnlineUsers}) => {
   const navigate = useNavigate()
   const logout = async() => {
     try {
@@ -44,7 +44,7 @@ const ChatSideBar = ({chats, user, setCurrentChat, islogin, setislogin}) => {
                 onClick={() => setCurrentChat(chat)}
                 className="cursor-pointer hover:bg-zinc-800 rounded-xl transition-all"
                 >
-                  <Avatar chat={chat} user={user} />
+                  <Avatar chat={chat} user={user} OnlineUsers={OnlineUsers} />
                   </div>
                 ))}
                 </>

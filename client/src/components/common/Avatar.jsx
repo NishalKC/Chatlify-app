@@ -1,6 +1,6 @@
 import avatar from "../../assets/Nishal.jpg"
 
-const Avatar = ({chat, user}) => {
+const Avatar = ({chat, user, OnlineUsers}) => {
     // console.log(user._id);
     let userId = user._id
     let sender = chat.participants.filter((participant) => {
@@ -9,7 +9,9 @@ const Avatar = ({chat, user}) => {
        
     }
     )
-    // console.log(sender[0]);
+    const otherUser = chat.participants.find((p)=> p?._id !== userId)
+    const isOnline = OnlineUsers.includes(otherUser?._id);
+    console.log(isOnline);
     
     
   return (
@@ -17,7 +19,7 @@ const Avatar = ({chat, user}) => {
     <div className="flex flex-row gap-3">
         <div className="flex flex-row-reverse">
             <img src={avatar} className="h-15 md:h-10 md:w-10 bg-contain rounded-4xl" alt="" />
-            {sender.online?(
+            {isOnline?(
                 <div className="bg-green-600 absolute rounded-2xl p-1 h-fit"></div>
             ):("")}
         </div>

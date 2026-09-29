@@ -9,6 +9,7 @@ import { useSocket } from "../context/SocketContext";
 const Chat = ({ user , Islogin, setIslogin}) => {
   const socket = useSocket();
   const [Message, setMessage] = useState([])
+  const [OnlineUsers, setOnlineUsers] = useState([])
   const [chats, setChats] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
 
@@ -51,6 +52,19 @@ const Chat = ({ user , Islogin, setIslogin}) => {
 
   return () => socket.off("receive-message", handleReceiveMessage);
 }, [socket, currentChat]);
+
+useEffect(() => {
+  const handleOnlineUsers = (users) => {
+    console.log("🟢 Online Users:", users);
+    setOnlineUsers(users);
+  };
+
+  socket.on("online-users", handleOnlineUsers);
+
+  return () => {
+    socket.off("online-users", handleOnlineUsers);
+  };
+}, [socket]);
   return (
     <div className="flex h-screen bg-zinc-950 gap-5 md:px-4 py-5 text-white">
       <ChatSideBar
@@ -59,10 +73,11 @@ const Chat = ({ user , Islogin, setIslogin}) => {
         setCurrentChat={setCurrentChat}
         islogin={Islogin}
         setislogin={setIslogin}
+        OnlineUsers={OnlineUsers}
       />
 
       <div className="flex flex-col flex-1">
-        <ChatHeader chat={currentChat} user={user}/>
+        <ChatHeader chat={currentChat} user={user} OnlineUsers={OnlineUsers}/>
         <Chatmessages chats={currentChat} user={user} Message={Message} setMessage={setMessage}/>
         <ChatInput chat={currentChat} user={user} Message={Message} setMessage={setMessage}/>
       </div>

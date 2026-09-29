@@ -1,10 +1,11 @@
 import { Phone, Video } from "lucide-react"
 import avatar from "../../assets/react.svg"
 
-const ChatHeader = ({chat, user}) => {
+const ChatHeader = ({chat, user, OnlineUsers}) => {
 
     const receiver = chat?.participants?.find(p => p._id !== user._id);
     console.log("head", receiver);
+    const isonline= OnlineUsers.includes(receiver?._id)
     
   return (
     <div className="flex justify-between md:px-4 md:py-3  rounded-md w-full bg-zinc-800">
@@ -13,7 +14,7 @@ const ChatHeader = ({chat, user}) => {
             <div className="text-[14px] md:text-2xl">
                 <h1>{receiver?.fullname || "Unknown"}</h1>
                 <h1 className="text-zinc-500 md:text-[17px]">
-                    {receiver?.online?"online": "offline"}
+                    {isonline?"online": "offline"}
                 </h1>
             </div>
         </div>

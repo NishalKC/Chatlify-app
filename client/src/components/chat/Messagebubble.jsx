@@ -29,7 +29,7 @@ const Messagebubble = ({ msg, user }) => {
   
   return (
     <div>
-      {user?._id === msg?.sender?._id ? (
+      {user?._id !== msg?.sender?._id ? (
         <div className="md:px-5 py-4 flex flex-col">
           <div className="flex flex-col-reverse w-full">
             <div className="flex gap-3 py-1 align-middle">
