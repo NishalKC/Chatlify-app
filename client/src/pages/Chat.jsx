@@ -10,6 +10,7 @@ const Chat = ({ user , Islogin, setIslogin}) => {
   const socket = useSocket();
   const [Message, setMessage] = useState([])
   const [OnlineUsers, setOnlineUsers] = useState([])
+  const [Istyping, setIstyping] = useState(false)
   const [chats, setChats] = useState([]);
   const [currentChat, setCurrentChat] = useState(null);
 
@@ -23,7 +24,37 @@ const Chat = ({ user , Islogin, setIslogin}) => {
       console.log(error);
     }
   };
+  useEffect(() => {
+  const handleTyping = ({ conversationId }) => {
+    console.log("📥 USER TYPING:", conversationId);
 
+    if (
+      currentChat?._id &&
+      conversationId?.toString() === currentChat._id.toString()
+    ) {
+      setIstyping(true);
+    }
+  };
+
+  const handleStopTyping = ({ conversationId }) => {
+    console.log("📥 USER STOP TYPING:", conversationId);
+
+    if (
+      currentChat?._id &&
+      conversationId?.toString() === currentChat._id.toString()
+    ) {
+      setIstyping(false);
+    }
+  };
+
+  socket.on("typing-user", handleTyping);
+  socket.on("stop-typing-user", handleStopTyping);
+
+  return () => {
+    socket.off("typing-user", handleTyping);
+    socket.off("stop-typing-user", handleStopTyping);
+  };
+}, [socket, currentChat]);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (userId) loadChats();
@@ -36,7 +67,8 @@ const Chat = ({ user , Islogin, setIslogin}) => {
     }
     },[userId, socket]
     )
-    useEffect(() => {
+
+  useEffect(() => {
   const handleReceiveMessage = (message) => {
     console.log("📩 Received:", message);
 
@@ -77,9 +109,9 @@ useEffect(() => {
       />
 
       <div className="flex flex-col flex-1">
-        <ChatHeader chat={currentChat} user={user} OnlineUsers={OnlineUsers}/>
-        <Chatmessages chats={currentChat} user={user} Message={Message} setMessage={setMessage}/>
-        <ChatInput chat={currentChat} user={user} Message={Message} setMessage={setMessage}/>
+        <ChatHeader chat={currentChat} user={user} OnlineUsers={OnlineUsers} Istyping={Istyping}/>
+        <Chatmessages chats={currentChat} user={user} Message={Message} setMessage={setMessage} />
+        <ChatInput chat={currentChat} user={user} Message={Message} setMessage={setMessage} />
       </div>
     </div>
   );

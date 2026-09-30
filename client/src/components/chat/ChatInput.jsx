@@ -1,15 +1,39 @@
 import { Mic, ImagePlus, SmileIcon, ArrowRight, X } from 'lucide-react';
 import { useState, useRef } from 'react';
 import api from "../../services/Api"
+import {useSocket} from "../../context/SocketContext"
 
 const ChatInput = ({chat, user,setMessage}) => {
   const [Text, setText] = useState("")
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
+  const typingTimeout = useRef(null);
   const iconSize = 30;
-  const handletext= (e) => {
-    setText(e.target.value)
-  }
+  const socket = useSocket()
+  const handleTyping = (e) => {
+  const value = e.target.value;
+  setText(value);
+
+  if (!chat || !socket) return;
+
+  const receiverId = chat.participants.find(
+    (p) => p?._id !== user?._id
+  )?._id;
+
+  socket.emit("typing", {
+    receiverId,
+    conversationId: chat?._id,
+  });
+
+  clearTimeout(typingTimeout.current);
+
+  typingTimeout.current = setTimeout(() => {
+    socket.emit("stop-typing", {
+      receiverId,
+      conversationId: chat?._id,
+    });
+  }, 1000);
+};
  const sendMessage = async (e) => {
   e.preventDefault();   // IMPORTANT
 
@@ -25,6 +49,7 @@ const ChatInput = ({chat, user,setMessage}) => {
       receiverId,
       text: Text,
     });
+    socket
     setMessage((prev) => [...prev, res.data]);
     setText("");
   } catch (err) {
@@ -95,7 +120,7 @@ const ChatInput = ({chat, user,setMessage}) => {
         <input 
           type="text" 
           value={Text}
-          onChange={handletext}
+          onChange={handleTyping}
           className="w-3/4 px-3 py-3 rounded-2xl bg-zinc-800 text-white outline-none placeholder:text-zinc-400" 
           placeholder="Message.." 
         />

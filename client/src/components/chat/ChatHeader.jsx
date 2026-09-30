@@ -1,7 +1,7 @@
 import { Phone, Video } from "lucide-react"
 import avatar from "../../assets/react.svg"
 
-const ChatHeader = ({chat, user, OnlineUsers}) => {
+const ChatHeader = ({chat, user, OnlineUsers, Istyping}) => {
 
     const receiver = chat?.participants?.find(p => p._id !== user._id);
     console.log("head", receiver);
@@ -13,9 +13,15 @@ const ChatHeader = ({chat, user, OnlineUsers}) => {
             <img src={avatar} alt=""  className="p-1 md:h-10 h-8"/>
             <div className="text-[14px] md:text-2xl">
                 <h1>{receiver?.fullname || "Unknown"}</h1>
-                <h1 className="text-zinc-500 md:text-[17px]">
+                {Istyping?(
+                    <h1 className="text-zinc-500 md:text-[17px]">
+                        Typing..
+                    </h1>
+                ):
+                <h1 className="text-zinc-500 md:text-[17px]"> 
                     {isonline?"online": "offline"}
                 </h1>
+                }
             </div>
         </div>
     <div className="p-3 flex gap-6">

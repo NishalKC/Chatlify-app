@@ -25,7 +25,7 @@ const formatMessageTime = (dateString) => {
 };
 
 const Messagebubble = ({ msg, user }) => {
-  console.log(msg);
+  // console.log(msg);
   
   return (
     <div>

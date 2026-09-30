@@ -28,19 +28,30 @@ const initializeSocket = (server) => {
         io.to(receiverSocket).emit("receive-message", message);
       }
     });
-    socket.on("typing", ({receiverId}) => {
-      let receiverSocket = onlineUsers.get(receiverId)
-      if(receiverSocket){
-        io.to(receiverId).emit("typing")
-      }
-    }
-    )
-    socket.on("stop-typing", ({ receiverId }) => {
-    const receiverSocket = onlineUsers.get(receiverId);
+   socket.on("typing", ({ receiverId, conversationId }) => {
+  const receiverSocket = onlineUsers.get(receiverId.toString());
 
-    if(receiverSocket){
-        io.to(receiverSocket).emit("stop-typing");
-    }
+  console.log("⌨️ Typing:", receiverId);
+  console.log("📡 Receiver socket:", receiverSocket);
+
+  if (receiverSocket) {
+    io.to(receiverSocket).emit("typing-user", {
+      conversationId: conversationId.toString(),
+    });
+  }
+});
+
+socket.on("stop-typing", ({ receiverId, conversationId }) => {
+  const receiverSocket = onlineUsers.get(receiverId.toString());
+
+  console.log("🛑 Stop typing:", receiverId);
+  console.log("📡 Receiver socket:", receiverSocket);
+
+  if (receiverSocket) {
+    io.to(receiverSocket).emit("stop-typing-user", {
+      conversationId: conversationId.toString(),
+    });
+  }
 });
     socket.on("disconnect", () => {
       for (const [userId, socketId] of onlineUsers.entries()) {
