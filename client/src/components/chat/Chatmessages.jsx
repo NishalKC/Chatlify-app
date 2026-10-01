@@ -3,9 +3,11 @@ import Messagebubble from './Messagebubble';
 import EmptyChat from './EmptyChat';
 import api from '../../services/Api';
 import { useEffect, useRef } from 'react';
+import {useSocket} from "../../context/SocketContext"
 
 const Chatmessages = ({ chats ,user, Message, setMessage}) => {
   const bottomRef = useRef();
+  const socket = useSocket()
   const loadAllMessage = async () => {
     // If chats doesn't exist yet, don't execute the API request
     if (!chats?._id) return; 
@@ -27,6 +29,31 @@ const Chatmessages = ({ chats ,user, Message, setMessage}) => {
     behavior: "smooth",
   });
   }, [Message]);
+
+  useEffect(() => {
+  if (!chats?._id) return;
+
+  const markAsSeen = async () => {
+    try {
+      await api.put("/message/seen", {
+        conversationId: chats._id
+      });
+      const Others= chats.participants.find((p)=> p?._id !== user?._id)
+      console.log("other", Others?._id, user?._id);
+      
+      if(Others?._id){
+        socket.emit("message-seen", {
+          senderId: Others?._id,
+          conversationId: chats._id
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  markAsSeen();
+}, [chats?._id]);
 
   if (!chats) {
     return <EmptyChat />;

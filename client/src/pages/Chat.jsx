@@ -67,7 +67,29 @@ const Chat = ({ user , Islogin, setIslogin}) => {
     }
     },[userId, socket]
     )
+    useEffect(() => {
+  const handleMessagesSeen = ({ conversationId }) => {
+    if (
+      currentChat?._id &&
+      conversationId?.toString() === currentChat._id.toString()
+    ) {
+      setMessage((prev) =>
+    prev.map((msg) =>
+      msg.sender?._id?.toString() === user?._id?.toString()
+        ? { ...msg, seen: true }
+        : msg
+  )
+);
+    }
+  };
 
+  socket.on("messages-seen", handleMessagesSeen);
+
+  return () => {
+    socket.off("messages-seen", handleMessagesSeen);
+  };
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [socket, currentChat]);
   useEffect(() => {
   const handleReceiveMessage = (message) => {
     console.log("📩 Received:", message);

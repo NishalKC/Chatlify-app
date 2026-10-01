@@ -53,6 +53,22 @@ socket.on("stop-typing", ({ receiverId, conversationId }) => {
     });
   }
 });
+  socket.on("message-seen", ({ senderId, conversationId }) => {
+  console.log("👀 MESSAGE SEEN:", {
+    senderId,
+    conversationId,
+  });
+
+  const senderSocket = onlineUsers.get(senderId.toString());
+
+  console.log("📡 Sender socket:", senderSocket);
+
+  if (senderSocket) {
+    io.to(senderSocket).emit("messages-seen", {
+      conversationId: conversationId.toString(),
+    });
+  }
+});
     socket.on("disconnect", () => {
       for (const [userId, socketId] of onlineUsers.entries()) {
         if (socketId === socket.id) {

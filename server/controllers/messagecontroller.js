@@ -45,3 +45,51 @@ module.exports.getmessage= async(req, res ) => {
         })
     }    
 }
+
+module.exports.seenmessage = async (req, res) => {
+  try {
+    const { conversationId } = req.body;
+
+    console.log("👀 Seen conversation:", conversationId);
+    console.log("👤 Current user:", req.user?._id);
+
+    if (!conversationId) {
+      return res.status(400).json({
+        message: "conversationId is required",
+      });
+    }
+
+    if (!req.user?._id) {
+      return res.status(401).json({
+        message: "User not authenticated",
+      });
+    }
+
+    const result = await messageModel.updateMany(
+      {
+        conversation: conversationId,
+        sender: { $ne: req.user._id },
+        seen: false,
+      },
+      {
+        $set: {
+          seen: true,
+        },
+      }
+    );
+
+    console.log("✅ Messages marked seen:", result.modifiedCount);
+
+    return res.status(200).json({
+      success: true,
+      modifiedCount: result.modifiedCount,
+    });
+
+  } catch (error) {
+    console.error("❌ Seen message error:", error);
+
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
+};

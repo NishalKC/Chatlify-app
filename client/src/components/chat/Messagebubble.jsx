@@ -52,6 +52,11 @@ const Messagebubble = ({ msg, user }) => {
             </div>
             <p className="bg-blue-500 w-4/5 md:max-w-fit px-5 py-1 rounded-md self-end">{msg?.text}</p>
           </div>
+          {user?._id === msg?.sender?._id && (
+            <span className="ml-1 text-xs self-end">
+              {msg.seen ? "✓✓" : "✓"}
+            </span>
+          )}
         </div>
       )}
     </div>
